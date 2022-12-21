@@ -31,7 +31,6 @@ import Reflex.PerformEvent.Class
 import Reflex.Requester.Base
 import Reflex.Requester.Class
 
-import Control.Lens
 import Control.Monad.Exception
 import Control.Monad.Identity
 import Control.Monad.Primitive

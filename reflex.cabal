@@ -81,7 +81,6 @@ library
     data-default >= 0.5 && < 0.8,
     dependent-map >= 0.3 && < 0.5,
     exception-transformers == 0.4.*,
-    lens >= 4.7 && < 5.2,
     mmorph >= 1.0 && < 1.2,
     monad-control >= 1.0.1 && < 1.1,
     mtl >= 2.1 && < 2.3,
