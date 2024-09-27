@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Reflex.TriggerEvent.Class
   ( TriggerEvent (..)
   ) where

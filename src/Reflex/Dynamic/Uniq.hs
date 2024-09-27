@@ -5,6 +5,7 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 -- | This module provides a variation of 'Dynamic' values that uses cheap
 -- pointer equality checks to reduce the amount of signal propagation needed.
 module Reflex.Dynamic.Uniq
@@ -14,8 +15,12 @@ module Reflex.Dynamic.Uniq
   , alreadyUniqDynamic
   ) where
 
-import Control.Applicative (Applicative (..))
 import GHC.Exts
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad.Applicative (Applicative(..))
+#endif
+
 import Reflex.Class
 
 -- | A 'Dynamic' whose 'updated' 'Event' will never fire with the same value as
@@ -101,5 +106,3 @@ instance Reflex t => Applicative (UniqDynamic t) where
 
 instance Reflex t => Monad (UniqDynamic t) where
   UniqDynamic x >>= f = uniqDynamic $ x >>= unUniqDynamic . f
-  _ >> b = b
-  return = pure

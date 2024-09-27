@@ -12,17 +12,20 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.PerformEvent.Class
   ( PerformEvent (..)
   , performEventAsync
   ) where
 
 import Control.Monad
-import Control.Monad.Fix
 import Control.Monad.Reader
 import Control.Monad.Trans.Maybe (MaybeT (..))
-
 import Data.Kind (Type)
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad.Fix
+#endif
 
 import Reflex.Class
 import Reflex.TriggerEvent.Class

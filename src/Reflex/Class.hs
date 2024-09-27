@@ -204,7 +204,6 @@ import qualified Data.Dependent.Map as DMap
 import Data.Functor.Compose
 import Data.Functor.Product
 import Data.GADT.Compare (GEq (..), GCompare (..))
-import Data.FastMutableIntMap (PatchIntMap)
 import Data.Foldable
 import Data.Functor.Bind
 import Data.Functor.Misc
@@ -220,12 +219,12 @@ import Data.String
 import Data.These
 import Data.Type.Coercion
 import Data.Type.Equality ((:~:) (..))
-import Data.Witherable (Filterable(..))
-import qualified Data.Witherable as W
 import Reflex.FunctorMaybe (FunctorMaybe)
 import qualified Reflex.FunctorMaybe
 import Data.Patch
 import qualified Data.Patch.MapWithMove as PatchMapWithMove
+import Witherable (Filterable(..))
+import qualified Witherable as W
 
 import Debug.Trace (trace)
 
@@ -679,15 +678,12 @@ instance (Reflex t, IsString a) => IsString (Behavior t a) where
 
 instance Reflex t => Monad (Behavior t) where
   a >>= f = pull $ sample a >>= sample . f
-  -- Note: it is tempting to write (_ >> b = b); however, this would result in (fail x >> return y) succeeding (returning y), which violates the law that (a >> b = a >>= \_ -> b), since the implementation of (>>=) above actually will fail.  Since we can't examine 'Behavior's other than by using sample, I don't think it's possible to write (>>) to be more efficient than the (>>=) above.
-  return = constant
 #if !MIN_VERSION_base(4,13,0)
   fail = error "Monad (Behavior t) does not support fail"
 #endif
 
 instance (Reflex t, Monoid a) => Monoid (Behavior t a) where
   mempty = constant mempty
-  mappend a b = pull $ liftM2 mappend (sample a) (sample b)
   mconcat = pull . fmap mconcat . mapM sample
 
 instance (Reflex t, Num a) => Num (Behavior t a) where
@@ -1159,7 +1155,6 @@ instance (Reflex t, Semigroup a) => Semigroup (Dynamic t a) where
 instance (Reflex t, Monoid a) => Monoid (Dynamic t a) where
   mconcat = distributeListOverDynWith mconcat
   mempty = constDyn mempty
-  mappend = zipDynWith mappend
 
 -- | This function converts a 'DMap' whose elements are 'Dynamic's into a
 -- 'Dynamic' 'DMap'.  Its implementation is more efficient than doing the same

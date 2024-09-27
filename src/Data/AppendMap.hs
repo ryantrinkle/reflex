@@ -7,6 +7,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
 -- |
 -- Module:
 --   Data.AppendMap
@@ -30,9 +31,11 @@ import qualified Data.Map.Internal.Debug as Map (showTree, showTreeWith)
 #else
 import qualified Data.Map as Map (showTree, showTreeWith)
 #endif
-import qualified Data.Witherable as W
 import Data.Map.Monoidal
+#if !MIN_VERSION_witherable(0,3,2)
 import qualified Data.Map.Monoidal as MonoidalMap
+import qualified Data.Witherable as W
+#endif
 
 
 {-# DEPRECATED AppendMap "Use 'MonoidalMap' instead" #-}

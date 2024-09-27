@@ -10,6 +10,7 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 -- |
 -- Module:
 --   Reflex.Collection
@@ -36,13 +37,16 @@ import Data.Zip (Zip (..))
 
 import Control.Monad
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Data.Align
 import Data.Functor.Misc
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Map.Misc
 import Data.These
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad.Identity
+#endif
 
 import Reflex.Class
 import Reflex.Adjustable.Class

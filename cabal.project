@@ -1,1 +1,4 @@
 packages: .
+
+if arch(javascript)
+  extra-packages: ghci

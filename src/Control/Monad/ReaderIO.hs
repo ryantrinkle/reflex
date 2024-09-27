@@ -2,16 +2,15 @@
 {-# language MultiParamTypeClasses #-}
 {-# language FlexibleInstances #-}
 {-# language CPP #-}
-module Control.Monad.ReaderIO
-  (
-    ReaderIO (..)
-  )
-  where
 
-import Control.Monad.Fix
-#if MIN_VERSION_base(4,10,0)
-import Control.Applicative
+module Control.Monad.ReaderIO
+  ( ReaderIO (..)
+  ) where
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Applicative (liftA2)
 #endif
+import Control.Monad.Fix
 import Control.Monad
 import Control.Monad.Reader.Class
 import Control.Monad.IO.Class

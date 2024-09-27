@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+
 -- |
 -- Module:
 --   Data.FastMutableIntMap

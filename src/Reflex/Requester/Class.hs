@@ -8,10 +8,12 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.Requester.Class
  ( Requester (..)
  , withRequesting

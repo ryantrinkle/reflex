@@ -19,19 +19,9 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.Requester.Base.Internal where
 
-import Reflex.Class
-import Reflex.Adjustable.Class
-import Reflex.Dynamic
-import Reflex.EventWriter.Class
-import Reflex.Host.Class
-import Reflex.PerformEvent.Class
-import Reflex.PostBuild.Class
-import Reflex.Requester.Class
-import Reflex.TriggerEvent.Class
-
-import Control.Applicative (liftA2)
 import Control.Monad
 import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
 import Control.Monad.Exception
@@ -55,7 +45,6 @@ import qualified Data.IntMap.Strict as IntMap
 import Data.Kind (Type)
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Monoid ((<>))
 import Data.Proxy
 import qualified Data.Semigroup as S
 import Data.Some (Some(Some))
@@ -64,6 +53,21 @@ import Data.Unique.Tag
 
 import GHC.Exts (Any)
 import Unsafe.Coerce
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Applicative (liftA2)
+import Data.Monoid ((<>))
+#endif
+
+import Reflex.Class
+import Reflex.Adjustable.Class
+import Reflex.Dynamic
+import Reflex.EventWriter.Class
+import Reflex.Host.Class
+import Reflex.PerformEvent.Class
+import Reflex.PostBuild.Class
+import Reflex.Requester.Class
+import Reflex.TriggerEvent.Class
 
 --TODO: Make this module type-safe
 
@@ -298,7 +302,6 @@ instance PrimMonad m => PrimMonad (RequesterT t request response m) where
 -- TODO: Monoid and Semigroup can likely be derived once StateT has them.
 instance (Monoid a, Monad m) => Monoid (RequesterT t request response m a) where
   mempty = pure mempty
-  mappend = liftA2 mappend
 
 instance (S.Semigroup a, Monad m) => S.Semigroup (RequesterT t request response m a) where
   (<>) = liftA2 (S.<>)

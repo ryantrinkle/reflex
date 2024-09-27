@@ -7,6 +7,7 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.DynamicWriter.Class
   ( MonadDynamicWriter
   , DynamicWriter(..)

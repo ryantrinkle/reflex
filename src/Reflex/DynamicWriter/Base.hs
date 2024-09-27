@@ -8,11 +8,13 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.DynamicWriter.Base
   ( DynamicWriterT (..)
   , runDynamicWriterT
@@ -23,7 +25,6 @@ import Control.Monad
 import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
 import Control.Monad.Exception
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Control.Monad.IO.Class
 import Control.Monad.Morph
 import Control.Monad.Primitive
@@ -39,9 +40,13 @@ import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
 import Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Semigroup (Semigroup(..))
 import Data.Some (Some)
 import Data.These
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad.Identity
+import Data.Semigroup (Semigroup(..))
+#endif
 
 import Reflex.Adjustable.Class
 import Reflex.Class
@@ -225,7 +230,7 @@ traverseIntMapWithKeyWithAdjustImpl base mergeMyDynIncremental f (dm0 :: IntMap 
   return (liftedResult0, liftedResult')
 
 -- | Map a function over the output of a 'DynamicWriterT'.
-withDynamicWriterT :: (Monoid w, Monoid w', Reflex t, MonadHold t m, MonadFix m)
+withDynamicWriterT :: (Monoid w, Monoid w', Reflex t, MonadFix m)
                    => (w -> w')
                    -> DynamicWriterT t w m a
                    -> DynamicWriterT t w' m a

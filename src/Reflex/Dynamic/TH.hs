@@ -8,6 +8,7 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 -- | Template Haskell helper functions for building complex 'Dynamic' values.
 module Reflex.Dynamic.TH
   ( qDynPure
@@ -15,17 +16,20 @@ module Reflex.Dynamic.TH
   , mkDynPure
   ) where
 
-import Reflex.Dynamic
-
 import Control.Monad.State
 import Data.Data
 import Data.Generics
-import Data.Monoid ((<>))
 import qualified Language.Haskell.Exts as Hs
 import qualified Language.Haskell.Meta.Syntax.Translate as Hs
 import Language.Haskell.TH
 import Language.Haskell.TH.Quote
 import qualified Language.Haskell.TH.Syntax as TH
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.Monoid ((<>))
+#endif
+
+import Reflex.Dynamic
 
 -- | Quote a 'Dynamic' expression.  Within the quoted expression, you can use
 -- @$(unqDyn [| x |])@ to refer to any expression @x@ of type @Dynamic t a@; the

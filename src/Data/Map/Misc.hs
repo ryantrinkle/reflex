@@ -1,4 +1,5 @@
 {-# LANGUAGE LambdaCase #-}
+
 -- | Additional functions for manipulating 'Map's.
 module Data.Map.Misc
   (

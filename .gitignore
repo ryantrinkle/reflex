@@ -1,5 +1,6 @@
 dist
 cabal.sandbox.config
+cabal.project.local
 .cabal-sandbox/
 dist-*
 cabal-dev

@@ -6,6 +6,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 -- |
 -- Module:
 --   Reflex.Query.Class
@@ -27,7 +28,6 @@ module Reflex.Query.Class
   , mapQueryResult
   ) where
 
-import Control.Applicative
 import Control.Category (Category)
 import qualified Control.Category as Cat
 import Control.Monad.Reader
@@ -37,11 +37,15 @@ import Data.Ix
 import Data.Kind (Type)
 import Data.Map.Monoidal (MonoidalMap)
 import qualified Data.Map.Monoidal as MonoidalMap
-import Data.Semigroup (Semigroup(..))
 import Data.Semigroup.Commutative
 import Data.Void
 import Data.Monoid hiding ((<>))
 import Foreign.Storable
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Applicative
+import Data.Semigroup (Semigroup(..))
+#endif
 
 import Reflex.Class
 

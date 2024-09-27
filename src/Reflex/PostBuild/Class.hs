@@ -10,6 +10,7 @@
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.PostBuild.Class
   ( PostBuild (..)
   ) where

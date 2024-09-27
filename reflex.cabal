@@ -1,503 +1,529 @@
-Name: reflex
-Version: 0.9.3.0
-Synopsis: Higher-order Functional Reactive Programming
-Description:
-  Interactive programs without callbacks or side-effects.
-  Functional Reactive Programming (FRP) uses composable events and time-varying
-  values to describe interactive systems as pure functions.
-  Just like other pure functional code, functional reactive code is easier
-  to get right on the first try, maintain, and reuse.
-  .
-  Reflex is a fully-deterministic, higher-order Functional Reactive Programming
-  interface and an engine that efficiently implements that interface.
-  .
-  <https://reflex-frp.org>
-License: BSD3
-License-file: LICENSE
-Author: Ryan Trinkle
-Maintainer: ryan.trinkle@gmail.com
-Stability: Experimental
-Category: FRP
-Build-type: Simple
-Cabal-version: 1.22
-homepage: https://reflex-frp.org
-bug-reports: https://github.com/reflex-frp/reflex/issues
-extra-source-files:
-  README.md
-  Quickref.md
-  ChangeLog.md
-
+cabal-version:      1.22
+name:               reflex
+version:            0.9.3.0
+license:            BSD3
+license-file:       LICENSE
+maintainer:         ryan.trinkle@gmail.com
+author:             Ryan Trinkle
+stability:          Experimental
 tested-with:
-  GHC  ==8.4.4 || ==8.6.5 || ==8.8.1 || ==8.10.7 || ==9.0.1 || ==9.2.5 || ==9.4.5 || ==9.6.1 || ==9.8.2,
-  GHCJS ==8.6 || ==8.10
+    ghc ==8.4.4 || ==8.6.5 || ==8.8.1 || ==8.10.7 || ==9.0.1 || ==9.2.5 || ==9.4.5 || ==9.6.1 || ==9.8.2 || ==9.10.1
+    ghcjs ==8.6 || ==8.10
 
-flag use-reflex-optimizer
-  description: Use the GHC plugin Reflex.Optimizer on some of the modules in the package.  This is still experimental.
-  default: False
-  manual: True
+homepage:           https://reflex-frp.org
+bug-reports:        https://github.com/reflex-frp/reflex/issues
+synopsis:           Higher-order Functional Reactive Programming
+description:
+    Interactive programs without callbacks or side-effects.
+    Functional Reactive Programming (FRP) uses composable events and time-varying
+    values to describe interactive systems as pure functions.
+    Just like other pure functional code, functional reactive code is easier
+    to get right on the first try, maintain, and reuse.
+    .
+    Reflex is a fully-deterministic, higher-order Functional Reactive Programming
+    interface and an engine that efficiently implements that interface.
+    .
+    <https://reflex-frp.org>
 
-flag use-template-haskell
-  description: Use template haskell to generate lenses
-  default: True
-  manual: True
-
-flag debug-trace-events
-  description: Add instrumentation that outputs the stack trace of the definition of an event whenever it is subscribed to. Warning: It is very slow!
-  default: False
-  manual: True
-
-flag fast-weak
-  description: Use the primitive implementation of FastWeak in GHCJS; note that this requires GHCJS to be built with FastWeak and FastWeakBag present in the RTS, which is not the default
-  default: False
-  manual: True
-
-flag debug-propagation
-  description: Enable debugging of spider internals
-  default: False
-  manual: True
-
-flag debug-cycles
-  description: Enable debugging of event cycles
-  default: False
-  manual: True
-
-flag split-these
-  description: Use split these/semialign packages
-  manual:      False
-  default:     True
-
-library
-  default-language: Haskell2010
-  hs-source-dirs: src
-  build-depends:
-    MemoTrie == 0.6.*,
-    base >= 4.11 && < 4.20,
-    bifunctors >= 5.2 && < 5.7,
-    comonad >= 5.0.4 && < 5.1,
-    commutative-semigroups >= 0.1 && <0.2,
-    constraints >= 0.10 && <0.14,
-    constraints-extras >= 0.3 && < 0.5,
-    containers >= 0.6 && < 0.7,
-    data-default >= 0.5 && < 0.8,
-    dependent-sum >= 0.6 && < 0.8,
-    dependent-map >= 0.3 && < 0.5,
-    exceptions >= 0.10 && < 0.11,
-    exception-transformers >= 0.4 && < 0.5,
-    lens >= 4.7 && < 5.3,
-    mmorph >= 1.0 && < 1.3,
-    monad-control >= 1.0.1 && < 1.1,
-    mtl >= 2.1 && < 2.4,
-    patch >= 0.0.7 && < 0.1,
-    prim-uniq >= 0.1.0.1 && < 0.3,
-    primitive >= 0.5 && < 0.9,
-    profunctors >= 5.3 && < 5.7,
-    random >= 1.1 && < 1.3,
-    ref-tf >= 0.4 && < 0.6,
-    reflection == 2.1.*,
-    semigroupoids >= 4.0 && < 7,
-    stm >= 2.4 && < 2.6,
-    syb >= 0.5 && < 0.8,
-    time >= 1.4 && < 1.13,
-    transformers >= 0.5 && < 0.7,
-    unbounded-delays >= 0.1.0.0 && < 0.2,
-    witherable >= 0.4 && < 0.5
-
-  if flag(split-these)
-    build-depends:     these >= 1 && <1.3,
-                       semialign >=1 && <1.4,
-                       monoidal-containers >= 0.6.2.0 && < 0.7
-  else
-    build-depends:     these >= 0.4 && <0.9,
-                       monoidal-containers == 0.4.0.0
-
-  exposed-modules:
-    Control.Monad.ReaderIO
-    Data.AppendMap,
-    Data.FastMutableIntMap,
-    Data.FastWeakBag,
-    Data.Map.Misc,
-    Data.WeakBag,
-    Reflex,
-    Reflex.Class,
-    Reflex.Adjustable.Class,
-    Reflex.BehaviorWriter.Base,
-    Reflex.BehaviorWriter.Class,
-    Reflex.Collection,
-    Reflex.Dynamic,
-    Reflex.Dynamic.Uniq,
-    Reflex.DynamicWriter,
-    Reflex.DynamicWriter.Base,
-    Reflex.DynamicWriter.Class,
-    Reflex.EventWriter,
-    Reflex.EventWriter.Base,
-    Reflex.EventWriter.Class,
-    Reflex.FastWeak,
-    Reflex.FunctorMaybe,
-    Reflex.Host.Class,
-    Reflex.Host.Headless,
-    Reflex.Network,
-    Reflex.NotReady.Class,
-    Reflex.PerformEvent.Base,
-    Reflex.PerformEvent.Class,
-    Reflex.PostBuild.Base,
-    Reflex.PostBuild.Class,
-    Reflex.Profiled,
-    Reflex.Pure,
-    Reflex.Query.Base,
-    Reflex.Query.Class,
-    Reflex.Requester.Base,
-    Reflex.Requester.Base.Internal,
-    Reflex.Requester.Class,
-    Reflex.Spider,
-    Reflex.Spider.Internal,
-    Reflex.Time,
-    Reflex.TriggerEvent.Base,
-    Reflex.TriggerEvent.Class,
-    Reflex.Widget.Basic,
-    Reflex.Workflow
-
-  reexported-modules:
-    patch:Data.Functor.Misc,
-    patch:Data.Patch as Reflex.Patch,
-    patch:Data.Patch.Class as Reflex.Patch.Class,
-    patch:Data.Patch.DMap as Reflex.Patch.DMap,
-    patch:Data.Patch.DMapWithMove as Reflex.Patch.DMapWithMove,
-    patch:Data.Patch.IntMap as Reflex.Patch.IntMap,
-    patch:Data.Patch.Map as Reflex.Patch.Map,
-    patch:Data.Patch.MapWithMove as Reflex.Patch.MapWithMove
-
-  ghc-options: -Wall -fwarn-redundant-constraints -fwarn-tabs -funbox-strict-fields -O2 -fspecialise-aggressively
-
-  if flag(debug-trace-events)
-    cpp-options: -DDEBUG_TRACE_EVENTS
-    build-depends:
-      bytestring >= 0.10.8 && < 0.11
-
-  if flag(use-reflex-optimizer)
-    cpp-options: -DUSE_REFLEX_OPTIMIZER
-    build-depends: ghc
-    exposed-modules: Reflex.Optimizer
-
-  if flag(debug-propagation)
-    cpp-options: -DDEBUG -DDEBUG_TRACE_PROPAGATION -DDEBUG_TRACE_INVALIDATION
-
-  if flag(debug-cycles)
-    cpp-options: -DDEBUG_CYCLES
-
-  if flag(use-template-haskell)
-    cpp-options: -DUSE_TEMPLATE_HASKELL
-    build-depends:
-      haskell-src-exts >= 1.16 && < 1.24,
-      haskell-src-meta >= 0.6 && < 0.9,
-      template-haskell >= 2.9 && < 2.22
-    exposed-modules:
-      Reflex.Dynamic.TH
-    other-extensions: TemplateHaskell
-
-  if flag(fast-weak) && impl(ghcjs)
-    cpp-options: -DGHCJS_FAST_WEAK
-
-  if impl(ghcjs)
-    build-depends:
-      ghcjs-base == 0.2.*
-
-test-suite semantics
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: semantics.hs
-  hs-source-dirs: test
-  ghc-options: -O2 -Wall -rtsopts
-  build-depends:
-    base,
-    bifunctors,
-    containers,
-    deepseq,
-    dependent-map,
-    dependent-sum,
-    mtl,
-    ref-tf,
-    reflex,
-    split,
-    transformers
-  other-modules:
-    Reflex.Bench.Focused
-    Reflex.Plan.Pure
-    Reflex.Plan.Reflex
-    Reflex.Test
-    Reflex.Test.Micro
-    Reflex.TestPlan
-
-test-suite CrossImpl
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: Reflex/Test/CrossImpl.hs
-  hs-source-dirs: test
-  ghc-options: -O2 -Wall -rtsopts
-  build-depends:
-    base,
-    containers,
-    dependent-map,
-    dependent-sum,
-    deepseq,
-    mtl,
-    transformers,
-    ref-tf,
-    reflex
-  other-modules:
-    Reflex.Test
-    Reflex.TestPlan
-    Reflex.Plan.Reflex
-    Reflex.Plan.Pure
-
-test-suite hlint
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: hlint.hs
-  hs-source-dirs: test
-  build-depends: base
-               , directory
-               , filepath
-               , filemanip
-  if impl(ghc >= 9.6)
-    buildable: False
-  if impl(ghc < 9.2)
-    build-depends: hlint (< 2.1 || >= 2.2.2) && < 3.5
-  else
-    build-depends: hlint >= 3.5 && < 3.6
-  if impl(ghcjs)
-    buildable: False
-
-test-suite EventWriterT
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: EventWriterT.hs
-  hs-source-dirs: test
-  build-depends: base
-               , containers
-               , deepseq
-               , dependent-map
-               , dependent-sum
-               , lens
-               , mtl
-               , these
-               , transformers
-               , reflex
-               , ref-tf
-
-  if flag(split-these)
-    build-depends: these-lens
-
-  other-modules:
-    Test.Run
-
-
-test-suite DebugCycles
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: DebugCycles.hs
-  hs-source-dirs: test
-  ghc-options: -threaded
-  build-depends: base
-               , containers
-               , deepseq
-               , dependent-map
-               , dependent-sum
-               , hspec
-               , lens
-               , mtl
-               , these
-               , transformers
-               , reflex
-               , ref-tf
-               , witherable
-               , proctest
-
-
-  if flag(split-these)
-    build-depends: these-lens, semialign
-
-  other-modules:
-    Test.Run
-
-
-test-suite RequesterT
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: RequesterT.hs
-  hs-source-dirs: test
-  build-depends: base
-               , constraints
-               , constraints-extras
-               , containers
-               , deepseq
-               , dependent-map
-               , dependent-sum
-               , lens
-               , mtl
-               , ref-tf
-               , reflex
-               , text
-               , these
-               , transformers
-
-  if flag(split-these)
-    build-depends: these-lens
-
-  other-modules:
-    Reflex.TestPlan
-    Reflex.Plan.Pure
-    Test.Run
-
-test-suite Headless
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: Headless.hs
-  hs-source-dirs: test
-  build-depends: base
-               , reflex
-
-test-suite Adjustable
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: Adjustable.hs
-  hs-source-dirs: test
-  build-depends: base
-               , containers
-               , dependent-sum
-               , reflex
-               , ref-tf
-               , these
-
-  other-modules:
-    Test.Run
-
-test-suite QueryT
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: QueryT.hs
-  hs-source-dirs: test
-  build-depends: base
-               , commutative-semigroups
-               , containers
-               , dependent-map
-               , dependent-sum
-               , deepseq
-               , lens
-               , monoidal-containers
-               , mtl
-               , patch
-               , ref-tf
-               , reflex
-               , these
-               , transformers
-
-  if flag(split-these)
-    build-depends: semialign, these-lens
-
-  other-modules:
-    Test.Run
-    Reflex.TestPlan
-    Reflex.Plan.Reflex
-    Reflex.Plan.Pure
-
-test-suite GC-Semantics
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: GC.hs
-  hs-source-dirs: test
-  build-depends: base
-               , containers
-               , dependent-sum
-               , dependent-map
-               , deepseq
-               , mtl
-               , patch
-               , these
-               , transformers
-               , reflex
-               , ref-tf
-
-  if flag(split-these)
-    build-depends: semialign
-
-  other-modules:
-    Reflex.Plan.Pure
-    Reflex.Plan.Reflex
-    Reflex.TestPlan
-    Test.Run
-
-test-suite rootCleanup
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  main-is: rootCleanup.hs
-  hs-source-dirs: test
-  build-depends: base
-               , containers
-               , deepseq
-               , dependent-sum
-               , mtl
-               , reflex
-               , ref-tf
-               , these
-  other-modules:
-    Reflex.Plan.Pure
-    Reflex.TestPlan
-    Test.Run
-
-benchmark spider-bench
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  hs-source-dirs: bench test
-  main-is: Main.hs
-  ghc-options: -Wall -O2 -rtsopts
-  build-depends:
-    base,
-    containers,
-    criterion,
-    deepseq,
-    dependent-map,
-    dependent-sum,
-    ref-tf,
-    mtl,
-    primitive,
-    reflex,
-    split,
-    stm,
-    transformers
-  other-modules:
-    Reflex.TestPlan
-    Reflex.Plan.Reflex
-    Reflex.Bench.Focused
-
-benchmark saulzar-bench
-  default-language: Haskell2010
-  type: exitcode-stdio-1.0
-  hs-source-dirs: bench test
-  c-sources: bench-cbits/checkCapability.c
-  main-is: RunAll.hs
-  ghc-options: -Wall -O2 -rtsopts -threaded
-  build-depends:
-    base,
-    containers,
-    criterion,
-    deepseq,
-    dependent-map,
-    dependent-sum,
-    loch-th,
-    mtl,
-    primitive,
-    process,
-    ref-tf,
-    reflex,
-    split,
-    stm,
-    time,
-    transformers
-  other-modules:
-    Reflex.TestPlan
-    Reflex.Plan.Reflex
-    Reflex.Bench.Focused
+category:           FRP
+build-type:         Simple
+extra-source-files:
+    README.md
+    Quickref.md
+    ChangeLog.md
 
 source-repository head
-  type: git
-  location: https://github.com/reflex-frp/reflex
+    type:     git
+    location: https://github.com/reflex-frp/reflex
+
+flag use-reflex-optimizer
+    description:
+        Use the GHC plugin Reflex.Optimizer on some of the modules in the package.  This is still experimental.
+
+    default:     False
+    manual:      True
+
+flag use-template-haskell
+    description: Use template haskell to generate lenses
+    manual:      True
+
+flag debug-trace-events
+    description:
+        Add instrumentation that outputs the stack trace of the definition of an event whenever it is subscribed to. Warning: It is very slow!
+
+    default:     False
+    manual:      True
+
+flag fast-weak
+    description:
+        Use the primitive implementation of FastWeak in GHCJS; note that this requires GHCJS to be built with FastWeak and FastWeakBag present in the RTS, which is not the default
+
+    default:     False
+    manual:      True
+
+flag debug-propagation
+    description: Enable debugging of spider internals
+    default:     False
+    manual:      True
+
+flag debug-cycles
+    description: Enable debugging of event cycles
+    default:     False
+    manual:      True
+
+flag split-these
+    description: Use split these/semialign packages
+
+library
+    exposed-modules:
+        Control.Monad.ReaderIO
+        Data.AppendMap
+        Data.FastMutableIntMap
+        Data.FastWeakBag
+        Data.Map.Misc
+        Data.WeakBag
+        Reflex
+        Reflex.Class
+        Reflex.Adjustable.Class
+        Reflex.BehaviorWriter.Base
+        Reflex.BehaviorWriter.Class
+        Reflex.Collection
+        Reflex.Dynamic
+        Reflex.Dynamic.Uniq
+        Reflex.DynamicWriter
+        Reflex.DynamicWriter.Base
+        Reflex.DynamicWriter.Class
+        Reflex.EventWriter
+        Reflex.EventWriter.Base
+        Reflex.EventWriter.Class
+        Reflex.FastWeak
+        Reflex.FunctorMaybe
+        Reflex.Host.Class
+        Reflex.Host.Headless
+        Reflex.Network
+        Reflex.NotReady.Class
+        Reflex.PerformEvent.Base
+        Reflex.PerformEvent.Class
+        Reflex.PostBuild.Base
+        Reflex.PostBuild.Class
+        Reflex.Profiled
+        Reflex.Pure
+        Reflex.Query.Base
+        Reflex.Query.Class
+        Reflex.Requester.Base
+        Reflex.Requester.Base.Internal
+        Reflex.Requester.Class
+        Reflex.Spider
+        Reflex.Spider.Internal
+        Reflex.Time
+        Reflex.TriggerEvent.Base
+        Reflex.TriggerEvent.Class
+        Reflex.Widget.Basic
+        Reflex.Workflow
+
+    reexported-modules:
+        patch:Data.Functor.Misc,
+        patch:Data.Patch as Reflex.Patch,
+        patch:Data.Patch.Class as Reflex.Patch.Class,
+        patch:Data.Patch.DMap as Reflex.Patch.DMap,
+        patch:Data.Patch.DMapWithMove as Reflex.Patch.DMapWithMove,
+        patch:Data.Patch.IntMap as Reflex.Patch.IntMap,
+        patch:Data.Patch.Map as Reflex.Patch.Map,
+        patch:Data.Patch.MapWithMove as Reflex.Patch.MapWithMove
+
+    hs-source-dirs:     src
+    default-language:   Haskell2010
+    ghc-options:
+        -Wall -fwarn-redundant-constraints -fwarn-tabs
+        -funbox-strict-fields -O2 -fspecialise-aggressively
+
+    build-depends:
+        MemoTrie >=0.6 && <0.7,
+        base >=4.11 && <4.21,
+        bifunctors >=5.2 && <5.7,
+        comonad >=5.0.4 && <5.1,
+        commutative-semigroups >=0.1 && <0.3,
+        constraints >=0.10 && <0.15,
+        constraints-extras >=0.3 && <0.5,
+        containers >=0.6 && <0.8,
+        data-default >=0.5 && <0.8,
+        dependent-map >=0.3 && <0.5,
+        dependent-sum >=0.6 && <0.8,
+        exceptions >=0.10 && <0.11,
+        exception-transformers >=0.4 && <0.5,
+        lens >=4.7 && <5.4,
+        mmorph >=1.0 && <1.3,
+        monad-control >=1.0.1 && <1.1,
+        mtl >=2.1 && <2.4,
+        patch >=0.0.7 && <0.1,
+        prim-uniq >=0.1.0.1 && <0.3,
+        primitive >=0.5 && <0.10,
+        profunctors >=5.3 && <5.7,
+        random >=1.1 && <1.3,
+        ref-tf >=0.4 && <0.6,
+        reflection >=2.1 && <2.2,
+        semigroupoids >=4.0 && <7,
+        stm >=2.4 && <2.6,
+        syb >=0.5 && <0.8,
+        time >=1.4 && <1.13,
+        transformers >=0.5 && <0.7,
+        unbounded-delays >=0.1.0.0 && <0.2,
+        witherable >=0.4 && <0.6
+
+    if flag(split-these)
+        build-depends:
+            these >=1 && <1.3,
+            semialign >=1 && <1.4,
+            monoidal-containers >=0.6.2.0 && <0.7
+
+    else
+        build-depends:
+            these >=0.4 && <0.9,
+            monoidal-containers ==0.4.0.0
+
+    if flag(debug-trace-events)
+        cpp-options:   -DDEBUG_TRACE_EVENTS
+        build-depends: bytestring >=0.10.8 && <0.11
+
+    if flag(use-reflex-optimizer)
+        exposed-modules: Reflex.Optimizer
+        cpp-options:     -DUSE_REFLEX_OPTIMIZER
+        build-depends:   ghc
+
+    if flag(debug-propagation)
+        cpp-options:
+            -DDEBUG -DDEBUG_TRACE_PROPAGATION -DDEBUG_TRACE_INVALIDATION
+
+    if flag(debug-cycles)
+        cpp-options: -DDEBUG_CYCLES
+
+    if flag(use-template-haskell)
+        exposed-modules:  Reflex.Dynamic.TH
+        cpp-options:      -DUSE_TEMPLATE_HASKELL
+        other-extensions: TemplateHaskell
+        build-depends:
+            haskell-src-exts >=1.16 && <1.24,
+            haskell-src-meta >=0.6 && <0.9,
+            template-haskell >=2.9 && <=2.22.0.0
+
+    if (flag(fast-weak) && impl(ghcjs >=0))
+        cpp-options: -DGHCJS_FAST_WEAK
+
+    if impl(ghcjs >=0)
+        build-depends: ghcjs-base >=0.2 && <0.3
+
+test-suite semantics
+    type:             exitcode-stdio-1.0
+    main-is:          semantics.hs
+    hs-source-dirs:   test
+    other-modules:
+        Reflex.Bench.Focused
+        Reflex.Plan.Pure
+        Reflex.Plan.Reflex
+        Reflex.Test
+        Reflex.Test.Micro
+        Reflex.TestPlan
+
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall -rtsopts
+    build-depends:
+        base,
+        bifunctors <5.7,
+        containers,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        mtl,
+        ref-tf <0.6,
+        reflex,
+        split <0.3,
+        transformers
+
+test-suite CrossImpl
+    type:             exitcode-stdio-1.0
+    main-is:          Reflex/Test/CrossImpl.hs
+    hs-source-dirs:   test
+    other-modules:
+        Reflex.Test
+        Reflex.TestPlan
+        Reflex.Plan.Reflex
+        Reflex.Plan.Pure
+
+    default-language: Haskell2010
+    ghc-options:      -O2 -Wall -rtsopts
+    build-depends:
+        base,
+        containers,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        deepseq,
+        mtl,
+        transformers,
+        ref-tf <0.6,
+        reflex
+
+test-suite hlint
+    type:             exitcode-stdio-1.0
+    main-is:          hlint.hs
+    hs-source-dirs:   test
+    default-language: Haskell2010
+    build-depends:
+        base,
+        directory,
+        filepath,
+        filemanip
+
+    if impl(ghc >=9.6)
+        buildable: False
+
+    if impl(ghc <9.2)
+        build-depends: hlint (<2.1 || >=2.2.2) && <3.5
+
+    else
+        build-depends: hlint >=3.5 && <3.6
+
+    if (impl(ghcjs >=0) || arch(javascript))
+        buildable: False
+
+test-suite EventWriterT
+    type:             exitcode-stdio-1.0
+    main-is:          EventWriterT.hs
+    hs-source-dirs:   test
+    other-modules:    Test.Run
+    default-language: Haskell2010
+    build-depends:
+        base,
+        containers,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        lens <5.4,
+        mtl,
+        these <1.3,
+        transformers,
+        reflex,
+        ref-tf <0.6
+
+    if flag(split-these)
+        build-depends: these-lens <1.1
+
+test-suite DebugCycles
+    type:             exitcode-stdio-1.0
+    main-is:          DebugCycles.hs
+    hs-source-dirs:   test
+    other-modules:    Test.Run
+    default-language: Haskell2010
+    ghc-options:      -threaded
+    build-depends:
+        base,
+        containers,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        hspec <2.12,
+        lens <5.4,
+        mtl,
+        these <1.3,
+        transformers,
+        reflex,
+        ref-tf <0.6,
+        witherable <0.6,
+        proctest <0.2
+
+    if flag(split-these)
+        build-depends:
+            these-lens <1.1,
+            semialign <1.4
+
+test-suite RequesterT
+    type:             exitcode-stdio-1.0
+    main-is:          RequesterT.hs
+    hs-source-dirs:   test
+    other-modules:
+        Reflex.TestPlan
+        Reflex.Plan.Pure
+        Test.Run
+
+    default-language: Haskell2010
+    build-depends:
+        base,
+        constraints <0.15,
+        constraints-extras <0.5,
+        containers,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        lens <5.4,
+        mtl,
+        ref-tf <0.6,
+        reflex,
+        text,
+        these <1.3,
+        transformers
+
+    if flag(split-these)
+        build-depends: these-lens <1.1
+
+test-suite Headless
+    type:             exitcode-stdio-1.0
+    main-is:          Headless.hs
+    hs-source-dirs:   test
+    default-language: Haskell2010
+    build-depends:
+        base,
+        reflex
+
+test-suite Adjustable
+    type:             exitcode-stdio-1.0
+    main-is:          Adjustable.hs
+    hs-source-dirs:   test
+    other-modules:    Test.Run
+    default-language: Haskell2010
+    build-depends:
+        base,
+        containers,
+        dependent-sum <0.8,
+        reflex,
+        ref-tf <0.6,
+        these <1.3
+
+test-suite QueryT
+    type:             exitcode-stdio-1.0
+    main-is:          QueryT.hs
+    hs-source-dirs:   test
+    other-modules:
+        Test.Run
+        Reflex.TestPlan
+        Reflex.Plan.Reflex
+        Reflex.Plan.Pure
+
+    default-language: Haskell2010
+    build-depends:
+        base,
+        commutative-semigroups <0.3,
+        containers,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        deepseq,
+        lens <5.4,
+        monoidal-containers <0.7,
+        mtl,
+        patch <0.1,
+        ref-tf <0.6,
+        reflex,
+        these <1.3,
+        transformers
+
+    if flag(split-these)
+        build-depends:
+            semialign <1.4,
+            these-lens <1.1
+
+test-suite GC-Semantics
+    type:             exitcode-stdio-1.0
+    main-is:          GC.hs
+    hs-source-dirs:   test
+    other-modules:
+        Reflex.Plan.Pure
+        Reflex.Plan.Reflex
+        Reflex.TestPlan
+        Test.Run
+
+    default-language: Haskell2010
+    build-depends:
+        base,
+        containers,
+        dependent-sum <0.8,
+        dependent-map <0.5,
+        deepseq,
+        mtl,
+        patch <0.1,
+        these <1.3,
+        transformers,
+        reflex,
+        ref-tf <0.6
+
+    if flag(split-these)
+        build-depends: semialign <1.4
+
+test-suite rootCleanup
+    type:             exitcode-stdio-1.0
+    main-is:          rootCleanup.hs
+    hs-source-dirs:   test
+    other-modules:
+        Reflex.Plan.Pure
+        Reflex.TestPlan
+        Test.Run
+
+    default-language: Haskell2010
+    build-depends:
+        base,
+        containers,
+        deepseq,
+        dependent-sum <0.8,
+        mtl,
+        reflex,
+        ref-tf <0.6,
+        these <1.3
+
+benchmark spider-bench
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    hs-source-dirs:   bench test
+    other-modules:
+        Reflex.TestPlan
+        Reflex.Plan.Reflex
+        Reflex.Bench.Focused
+
+    default-language: Haskell2010
+    ghc-options:      -Wall -O2 -rtsopts
+    build-depends:
+        base,
+        containers,
+        criterion <1.7,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        ref-tf <0.6,
+        mtl,
+        primitive <0.10,
+        reflex,
+        split <0.3,
+        stm,
+        transformers
+
+    if arch(javascript)
+        buildable: False
+
+benchmark saulzar-bench
+    type:             exitcode-stdio-1.0
+    main-is:          RunAll.hs
+    c-sources:        bench-cbits/checkCapability.c
+    hs-source-dirs:   bench test
+    other-modules:
+        Reflex.TestPlan
+        Reflex.Plan.Reflex
+        Reflex.Bench.Focused
+
+    default-language: Haskell2010
+    ghc-options:      -Wall -O2 -rtsopts -threaded
+    build-depends:
+        base,
+        containers,
+        criterion <1.7,
+        deepseq,
+        dependent-map <0.5,
+        dependent-sum <0.8,
+        loch-th <0.3,
+        mtl,
+        primitive <0.10,
+        process,
+        ref-tf <0.6,
+        reflex,
+        split <0.3,
+        stm,
+        time,
+        transformers
+
+    if arch(javascript)
+        buildable: False

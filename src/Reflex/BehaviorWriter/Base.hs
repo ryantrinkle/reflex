@@ -10,11 +10,13 @@ Description: Implementation of BehaviorWriter
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
 #ifdef USE_REFLEX_OPTIMIZER
 {-# OPTIONS_GHC -fplugin=Reflex.Optimizer #-}
 #endif
+
 module Reflex.BehaviorWriter.Base
   ( BehaviorWriterT (..)
   , runBehaviorWriterT
@@ -25,7 +27,6 @@ import Control.Monad
 import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
 import Control.Monad.Exception
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Control.Monad.IO.Class
 import Control.Monad.Morph
 import Control.Monad.Reader
@@ -39,6 +40,10 @@ import qualified Data.IntMap as IntMap
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Some (Some)
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad.Identity
+#endif
 
 import Reflex.Class
 import Reflex.Adjustable.Class
