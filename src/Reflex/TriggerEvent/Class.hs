@@ -2,13 +2,18 @@
 -- new 'Event's that can be triggered from 'IO'.
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE UndecidableInstances #-}
 module Reflex.TriggerEvent.Class
   ( TriggerEvent (..)
+  , newEventWithLazySTMTrigger
   ) where
 
 import Reflex.Class
 
+import Control.Applicative
+import Control.Concurrent
+import Control.Concurrent.STM
 import Control.Monad.Reader
 import Control.Monad.State
 import qualified Control.Monad.State.Strict as Strict
@@ -53,3 +58,34 @@ instance TriggerEvent t m => TriggerEvent t (MaybeT m) where
   newTriggerEvent = lift newTriggerEvent
   newTriggerEventWithOnComplete = lift newTriggerEventWithOnComplete
   newEventWithLazyTriggerWithOnComplete = lift . newEventWithLazyTriggerWithOnComplete
+
+-- | Create an 'Event' which triggers each time a blocking 'STM' action
+-- completes. This can be used to listen on a broadcast 'TChan' without leaking
+-- memory by duplicating it only when the event is being listened to. Note that
+-- the setup/teardown may happen multiple times, and there is no guarantee that
+-- the teardown will be executed promptly, or even at all, in the case of
+-- program termination.
+newEventWithLazySTMTrigger
+  :: TriggerEvent t m
+  => STM s
+  -- ^ Setup action returning state token, e.g. @/dupTChan eventBroadcastChan/@
+  -> (s -> STM ())
+  -- ^ Teardown action
+  -> (s -> STM a)
+  -- ^ Action to block on retrieving the next event value, e.g. 'readTChan'
+  -> m (Event t a)
+newEventWithLazySTMTrigger setup teardown getNextValue =
+  newEventWithLazyTriggerWithOnComplete $ \fire -> do
+    doneVar <- newEmptyTMVarIO
+    stateToken <- atomically setup
+    let waitDone = Nothing <$ readTMVar doneVar
+        waitNext = Just <$> getNextValue stateToken
+        loop = atomically (waitDone <|> waitNext) >>= \case
+          Nothing -> return ()
+          Just a -> do
+            fire a $ return ()
+            loop
+    void $ forkIO loop
+    return $ atomically $ do
+      putTMVar doneVar ()
+      teardown stateToken
