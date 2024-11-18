@@ -4,6 +4,9 @@
 
 * Add support for GHC 9.8 and 9.10
 
+* Get rid of the `use-template-haskell` flag.
+  Template Haskell is now always used.
+
 ## 0.9.3.0
 
 * Headless Host: Generalize to allow returning arbitrary types

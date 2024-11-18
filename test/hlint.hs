@@ -22,7 +22,6 @@ main = do
         , "--ignore=Use unless"
         , "--ignore=Reduce duplication"
         , "--ignore=Replace case with maybe"
-        , "--cpp-define=USE_TEMPLATE_HASKELL"
         , "--cpp-define=DEBUG"
         , "--ignore=Use tuple-section"
         ]

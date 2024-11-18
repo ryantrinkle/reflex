@@ -6,9 +6,6 @@ installed:     -all
 -- https://github.com/haskell/cabal/issues/6106
 install-dependencies: False
 
-constraint-set no-th
-  constraints: reflex -use-template-haskell
-
 constraint-set old-these
   ghc: <8.8
   constraints: these <1
