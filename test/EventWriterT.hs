@@ -20,7 +20,7 @@ import Data.These.Lens
 
 import Reflex
 import Reflex.EventWriter.Base
-import Test.Run
+import Reflex.Test.SimpleHost
 
 main :: IO ()
 main = do

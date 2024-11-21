@@ -1,0 +1,6 @@
+
+package *
+  ghc-location: ghc
+
+program-locations
+  ghc-location: ghc

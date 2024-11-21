@@ -26,7 +26,7 @@ import Data.These
 import Data.Align
 import Reflex
 import Reflex.EventWriter.Base
-import Test.Run
+import Reflex.Test.SimpleHost
 import Test.Hspec
 import Reflex.Spider.Internal (EventLoopException)
 import Data.Witherable (Filterable)

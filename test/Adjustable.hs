@@ -13,7 +13,7 @@ import Reflex
 import Reflex.EventWriter.Base
 import Reflex.Network
 import Reflex.Patch.MapWithMove
-import Test.Run
+import Reflex.Test.SimpleHost
 
 main :: IO ()
 main = do
