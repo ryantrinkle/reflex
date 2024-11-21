@@ -214,6 +214,11 @@ testCases =
       e <- events1
       return $ coincidence (deep e <$ e)
 
+  , testE "coincidence-8" $ do
+      e1 <- events1
+      e2 <- events2
+      pure . coincidence . fmap (const e1) $ e2
+
   , testB "holdWhileFiring" $ do
       e <- events1
       eo <- headE e
