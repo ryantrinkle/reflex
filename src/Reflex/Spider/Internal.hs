@@ -542,10 +542,12 @@ newSubscriberCoincidenceOuter subscribed = debugSubscriber ("SubscriberCoinciden
 newSubscriberCoincidenceInner :: forall x a. HasSpiderTimeline x => CoincidenceSubscribed x a -> IO (Subscriber x a)
 newSubscriberCoincidenceInner subscribed = debugSubscriber ("SubscriberCoincidenceInner" <> showNodeId subscribed) $ Subscriber
   { subscriberPropagate = \a -> {-# SCC "traverseCoincidenceInner" #-} do
+#ifdef DEBUG
       occ <- liftIO $ readIORef $ coincidenceSubscribedOccurrence subscribed
       case occ of
-        Just _ -> return () -- SubscriberCoincidenceOuter must have already propagated this event
+        Just _ -> error "Coincidence inner is propagating, but coincidence occurrence is already known?"
         Nothing -> do
+#endif          
           liftIO $ writeIORef (coincidenceSubscribedOccurrence subscribed) $ Just a
           scheduleClear $ coincidenceSubscribedOccurrence subscribed
           propagate a $ coincidenceSubscribedSubscribers subscribed
