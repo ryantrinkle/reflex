@@ -8,6 +8,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE RecursiveDo #-}
@@ -21,8 +22,8 @@
 #endif
 module Reflex.Requester.Base.Internal where
 
-import Reflex.Class
 import Reflex.Adjustable.Class
+import Reflex.Class
 import Reflex.Dynamic
 import Reflex.EventWriter.Class
 import Reflex.Host.Class
@@ -33,7 +34,7 @@ import Reflex.TriggerEvent.Class
 
 import Control.Applicative (liftA2)
 import Control.Monad
-import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
+import Control.Monad.Catch (MonadCatch, MonadMask, MonadThrow)
 import Control.Monad.Exception
 import Control.Monad.Fix
 import Control.Monad.Identity
@@ -57,6 +58,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Proxy
 import Data.Some (Some(Some))
+import Data.These
 import Data.Type.Equality
 import Data.Unique.Tag
 
@@ -544,12 +546,12 @@ matchResponseMapWithRequests
 matchResponseMapWithRequests f send recv = do
   rec nextId <- hold 1 $ fmap (\(next, _, _) -> next) outgoing
       waitingFor :: Incremental t (PatchMap Int (Decoder rawResponse response)) <-
-        holdIncremental mempty $ leftmost
-          [ fmap (\(_, outstanding, _) -> outstanding) outgoing
-          , snd <$> incoming
-          ]
+        holdIncremental mempty $
+          (snd <$> incoming) <> outstanding
+
       let outgoing = processOutgoing nextId send
-          incoming = processIncoming waitingFor recv
+          incoming = processIncoming waitingFor outstanding recv
+          outstanding = fmap (\(_, outstanding, _) -> outstanding) outgoing
   return (fmap (\(_, _, rawReqs) -> rawReqs) outgoing, fst <$> incoming)
   where
     -- Tags each outgoing request with an identifying integer key
@@ -567,12 +569,15 @@ matchResponseMapWithRequests f send recv = do
       -- The new next-available-key, a map of requests expecting responses, and the tagged raw requests
     processOutgoing nextId out = flip pushAlways out $ \dm -> do
       oldNextId <- sample nextId
-      let (result, newNextId) = flip runState oldNextId $ forM (requesterDataToList dm) $ \(k :=> v) -> do
+      let (result, newNextId) = flip runState oldNextId $
+            forM (requesterDataToList dm) $ \(k :=> v) -> do
             n <- get
             put $ succ n
             let (rawReq, rspF) = f v
             return (n, rawReq, Decoder k rspF)
-          patchWaitingFor = PatchMap $ Map.fromList $
+          patchWaitingFor =
+            PatchMap $
+              Map.fromList $
             (\(n, _, dec) -> (n, Just dec)) <$> result
           toSend = Map.fromList $ (\(n, rawReq, _) -> (n, rawReq)) <$> result
       return (newNextId, patchWaitingFor, toSend)
@@ -583,15 +588,27 @@ matchResponseMapWithRequests f send recv = do
     processIncoming
       :: Incremental t (PatchMap Int (Decoder rawResponse response))
       -- A map of outstanding expected responses
+      -> Event t (PatchMap Int (Decoder rawResponse response))
+      -- A map of response decoders for prompt responses
       -> Event t (Map Int rawResponse)
       -- A incoming response paired with its identifying key
       -> Event t (RequesterData response, PatchMap Int v)
       -- The decoded response and a patch that clears the outstanding responses queue
-    processIncoming waitingFor inc = flip push inc $ \rspMap -> do
-      wf <- sample $ currentIncremental waitingFor
+    processIncoming waitingFor outstanding inc = flip push (alignEventWithMaybe thatMaybe inc outstanding) $ \(rspMap, promptRspMap) -> do
+      wf' <- sample $ currentIncremental waitingFor
+      let wf = maybe id applyAlways promptRspMap wf'
       let match rawRsp (Decoder k rspF) =
             let rsp = rspF rawRsp
             in singletonRequesterData k rsp
           matches = Map.intersectionWith match rspMap wf
-      pure $ if Map.null matches then Nothing else Just
+      pure $
+        if Map.null matches
+          then Nothing
+          else
+            Just
         (Map.foldl' mergeRequesterData emptyRequesterData matches, PatchMap $ Nothing <$ matches)
+    thatMaybe :: These a b -> Maybe (a, Maybe b)
+    thatMaybe = \case
+      This x -> Just (x, Nothing)
+      That x -> Nothing
+      These x y -> Just (x, Just y)
