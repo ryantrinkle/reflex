@@ -29,11 +29,6 @@ main :: IO ()
 main = defaultMain
   [ bgroup "micro" micros ]
 
-#if !(MIN_VERSION_deepseq(1,4,2))
-instance NFData (IORef a) where
-  rnf x = seq x ()
-#endif
-
 instance NFData (TVar a) where
   rnf x = seq x ()
 

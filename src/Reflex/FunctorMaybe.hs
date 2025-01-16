@@ -1,8 +1,6 @@
 {-# LANGUAGE CPP #-}
-#if MIN_VERSION_base(4,9,0)
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE StandaloneDeriving #-}
-#endif
 
 -- |
 -- Module:
