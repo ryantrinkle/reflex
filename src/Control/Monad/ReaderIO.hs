@@ -9,9 +9,7 @@ module Control.Monad.ReaderIO
   where
 
 import Control.Monad.Fix
-#if MIN_VERSION_base(4,10,0)
 import Control.Applicative
-#endif
 import Control.Monad
 import Control.Monad.Reader.Class
 import Control.Monad.IO.Class
@@ -34,10 +32,8 @@ instance Applicative (ReaderIO e) where
   {-# INLINE pure #-}
   (<*>) = ap
   {-# INLINE (<*>) #-}
-#if MIN_VERSION_base(4,10,0)
   liftA2 = liftM2
   {-# INLINE liftA2 #-}
-#endif
 
 instance Monad (ReaderIO e) where
   ReaderIO q >>= f = ReaderIO $ \e -> q e >>= \a -> runReaderIO (f a) e

@@ -29,9 +29,7 @@
 -- a graph traversal algorithm to propagate 'Event's and 'Behavior's.
 module Reflex.Spider.Internal (module Reflex.Spider.Internal) where
 
-#if MIN_VERSION_base(4,10,0)
 import Control.Applicative (liftA2)
-#endif
 import Control.Concurrent
 import Control.Exception
 import Control.Monad hiding (forM, forM_, mapM, mapM_)
@@ -2577,9 +2575,7 @@ mapDynamicSpider f = SpiderDynamic . newMapDyn f . unSpiderDynamic
 
 instance HasSpiderTimeline x => Applicative (Reflex.Class.Dynamic (SpiderTimeline x)) where
   pure = SpiderDynamic . dynamicConst
-#if MIN_VERSION_base(4,10,0)
   liftA2 f a b = SpiderDynamic $ Reflex.Spider.Internal.zipDynWith f (unSpiderDynamic a) (unSpiderDynamic b)
-#endif
   SpiderDynamic a <*> SpiderDynamic b = SpiderDynamic $ Reflex.Spider.Internal.zipDynWith ($) a b
   a *> b = R.unsafeBuildDynamic (R.sample $ R.current b) $ R.leftmost [R.updated b, R.tag (R.current b) $ R.updated a]
   (<*) = flip (*>) -- There are no effects, so order doesn't matter
