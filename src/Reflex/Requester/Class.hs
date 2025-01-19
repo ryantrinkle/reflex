@@ -39,6 +39,8 @@ class (Reflex t, Monad m) => Requester t m | m -> t where
   type Response m :: Type -> Type
   -- | Emit a request whenever the given 'Event' fires, and return responses in
   -- the resulting 'Event'.
+  --
+  -- Semantically, the response event occurs at a later time than the request event.
   requesting :: Event t (Request m a) -> m (Event t (Response m a))
   -- | Emit a request whenever the given 'Event' fires, and ignore all responses.
   requesting_ :: Event t (Request m a) -> m ()
