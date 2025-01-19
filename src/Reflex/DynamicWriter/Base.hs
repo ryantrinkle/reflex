@@ -8,6 +8,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
 #ifdef USE_REFLEX_OPTIMIZER
@@ -23,7 +24,6 @@ import Control.Monad
 import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
 import Control.Monad.Exception
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Control.Monad.IO.Class
 import Control.Monad.Morph
 import Control.Monad.Primitive

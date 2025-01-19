@@ -96,7 +96,7 @@ import Data.Maybe
 import Data.These
 import Data.Type.Equality ((:~:) (..))
 
-import Debug.Trace hiding (traceEventWith)
+import Debug.Trace (trace)
 
 -- | Map a sampling function over a 'Dynamic'.
 mapDynM :: forall t m a b. (Reflex t, MonadHold t m) => (forall m'. MonadSample t m' => a -> m' b) -> Dynamic t a -> m (Dynamic t b)

@@ -5,6 +5,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE PolyKinds #-}
 
@@ -212,6 +213,3 @@ instance (Enum t, HasTrie t, Ord t) => MonadHold (Pure t) ((->) t) where
 
   headE = slowHeadE
   now t = Event $ guard . (t ==)
-
-  
-

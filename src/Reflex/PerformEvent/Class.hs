@@ -18,7 +18,6 @@ module Reflex.PerformEvent.Class
   ) where
 
 import Control.Monad
-import Control.Monad.Fix
 import Control.Monad.Reader
 import Control.Monad.Trans.Maybe (MaybeT (..))
 

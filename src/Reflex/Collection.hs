@@ -36,7 +36,6 @@ import Data.Zip (Zip (..))
 
 import Control.Monad
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Data.Align
 import Data.Functor.Misc
 import Data.Map (Map)

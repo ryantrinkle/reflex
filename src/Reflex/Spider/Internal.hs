@@ -38,7 +38,7 @@ import Control.Monad hiding (forM, forM_, mapM, mapM_)
 import Control.Monad.Catch (MonadMask, MonadThrow, MonadCatch)
 import Control.Monad.Exception
 import Control.Monad.Fix
-import Control.Monad.Identity hiding (forM, forM_, mapM, mapM_)
+import Control.Monad.Identity
 import Control.Monad.Primitive
 import Control.Monad.Reader.Class
 import Control.Monad.IO.Class
@@ -292,7 +292,7 @@ subscribeAndReadHead e sub = do
   return (subscription, occ)
 
 --TODO: Make this lazy in its input event
-headE :: (MonadIO m, Defer (SomeMergeInit x) m) => Event x a -> m (Event x a)
+headE :: (Defer (SomeMergeInit x) m) => Event x a -> m (Event x a)
 headE originalE = do
   parent <- liftIO $ newIORef $ Just originalE
   defer $ SomeMergeInit $ do --TODO: Rename SomeMergeInit appropriately
@@ -317,7 +317,7 @@ nowSpiderEventM :: (HasSpiderTimeline x) => EventM x (R.Event (SpiderTimeline x)
 nowSpiderEventM =
   SpiderEvent <$> now
 
-now :: (MonadIO m, Defer (Some Clear) m) => m (Event x ())
+now :: (Defer (Some Clear) m) => m (Event x ())
 now = do
   nowOrNot <- liftIO $ newIORef $ Just ()
   scheduleClear nowOrNot
